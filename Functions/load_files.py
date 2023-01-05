@@ -29,12 +29,12 @@ def load_file(file = '0.95', verbose = None):
     gait_daily_life['Gait speed [m/s]'] = gait_daily_life['KMPH'] / 3.6
     fig_f, ax_f = plt.subplots(1,2)
     sns.histplot(data=gait_daily_life, x='Gait speed [m/s]', binwidth= 0.027, ax = ax_f[0])
-    ax_f[0].set_title('1A')
+    ax_f[0].set_title('2A')
     example = gait_daily_life.loc[gait_daily_life['Subject'] == 'S5398H']
     example.rename(columns = {'T_moment': 'T moment'}, inplace = True)
     sns.histplot(data=example, x='Gait speed [m/s]', binwidth= 1/36, ax = ax_f[1],
-    hue = 'T moment')
-    ax_f[1].set_title('1B')
+    hue = 'T moment', multiple="stack")
+    ax_f[1].set_title('2B')
     plt.tight_layout()
     fig_f.savefig('Images/distribution.pdf', dpi=300, format='pdf')
     # ax_f.set_title('Distribution gait speed in daily life')

@@ -90,7 +90,12 @@ icc_mae(pca_test_hertest_df, number_of_components, verbose = True)
 # Add kmph and prepare for 
 pca_kmph = add_kmph(scaledData_df, rotated_loadings, new_selection, selection)
 totaal = pca_kmph.merge(selection, how = 'left', on = ['Subject number', 'T moment', 'aid'])
-totaal.corr().to_excel('Excel files/correlation/correlation_totaal.xlsx')
+tmp = totaal.corr()
+tmp = tmp.abs()
+for column in tmp.columns:
+    tmp.loc[tmp[column] < 0.3, column] = -1
+
+tmp.to_excel('Excel files/correlation/correlation_totaal.xlsx')
 
 
 #%%
