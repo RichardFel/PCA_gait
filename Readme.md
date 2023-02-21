@@ -1,20 +1,62 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww14060\viewh11620\viewkind0
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+# Principal component analysis and linear mixed models 
 
-\f0\fs24 \cf0 Instructions:\
-\
-1. Preparation:\
-	1.1. Calculate gait features from 2 min walk test per participant -> Place file in raw_files\
-	1.2. Calculate gait features from physical activity per participant -> place file in raw_files\
-2. Delete invalid files:\
-	2.1. Run \'91detect_duplicates.py\'92 to detect which participants are actual participants.\
-3. Clean data:\
-	3.1 Run\'92 clean_data.py\'92 to remove highly correlated and uncorrelated files\
-4. Run PCA & LMEM\
-	4.1 Run \'91compute_PCA_gait.py\'92 to calculate the PCA, compute ICC/MDC per component and 	determine the significance of the components in predicting gait speed in comparison to gait speed alone. \
-\
-}
+
+
+## Description
+
+
+
+## Getting Started
+
+### Dependencies
+
+* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
+* ex. Windows 10
+
+### Installing
+
+* How/where to download your program
+* Any modifications needed to be made to files/folders
+
+### Executing program
+
+* How to run the program
+* Step-by-step bullets
+```
+code blocks for commands
+```
+
+## Help
+
+Any advise for common problems or issues.
+```
+command to run if program contains helper info
+```
+
+## Authors
+
+Contributors names and contact info
+
+ex. Dominique Pizzie  
+ex. [@DomPizzie](https://twitter.com/dompizzie)
+
+## Version History
+
+* 0.2
+    * Various bug fixes and optimizations
+    * See [commit change]() or See [release history]()
+* 0.1
+    * Initial Release
+
+## License
+
+This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+
+## Acknowledgments
+
+Inspiration, code snippets, etc.
+* [awesome-readme](https://github.com/matiassingers/awesome-readme)
+* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
+* [dbader](https://github.com/dbader/readme-template)
+* [zenorocha](https://gist.github.com/zenorocha/4526327)
+* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
