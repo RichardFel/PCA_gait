@@ -1,62 +1,42 @@
 # Principal component analysis and linear mixed models 
 
-
-
 ## Description
 
-
+This algorithm was created for the paper: 'beyond gait speed' in which we evaluated the association between gait speed obtained from a two-minute walk test and measures of walking behavior in daily life. 
+The following steps are conducted in this algorithm:
+1. Data is 'cleaned' by only including reliable gait features (ICC > 0.75) which are correlated with at least 0.3. If multiple features had a correlation > 0.95, only one of t hese was included in further analysis.
+2. A principal component analysis (PCA) is applied to the data 
+3. The corresponding loadings are tested by transforming test-retest data (unused in the computation of the PCA) into principal components and calculating the reliability. 
+4. Last, per measures of walking ability a baseline gait-speed-only linear mixed model (LMM) is created. The PC are added via a forward selection procedure. 
 
 ## Getting Started
 
-### Dependencies
+The data required to run the code will be made availible after publication of the study.
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+1. Proces the raw data using the clean_data.py file.
+2. Calculate the PCA and the LMM by running the compute_pca_gait.py file.
 
-### Installing
+### Libraries
+* Numpy
+* Matplotlib
+* Seaborn
+* Pandas
+* Statsmodels
+* Sklearn
+* factor_analyzer
+* pingouin
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
 
 ## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+For help or information contact: richard.felius@hu.nl.
 
 ## Authors
+Richard Felius; Utrecht University of applied sciences; email: richard.felius@hu.nl.
 
-Contributors names and contact info
-
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
 
 ## Version History
-
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
 * 0.1
     * Initial Release
 
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
 
 ## Acknowledgments
-
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
