@@ -1,20 +1,14 @@
 import pandas as pd
 import numpy as np
-import scipy
-
-from sklearn.decomposition import PCA
-from sklearn import preprocessing
-
-from factor_analyzer import Rotator
-from factor_analyzer.factor_analyzer import calculate_kmo
-
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import figure, show
-from matplotlib.ticker import MaxNLocator
-from sklearn.model_selection import cross_val_score
 import pingouin as pg
 
 def load_rotate_test_hertest(new_selection, scaler, pca):
+    '''
+    Description:
+    1. Compute the principal components based on test-retest data
+    2. Calculate ICC scores
+    '''
+
     test_hertest = pd.read_excel('Excel files/Raw_files/gait_features_test_retest.xlsx', index_col=0)
     nFilesPP = 2
     countValues = test_hertest['Subject number'].value_counts()
@@ -23,14 +17,11 @@ def load_rotate_test_hertest(new_selection, scaler, pca):
     test_hertest_selection = test_hertest.loc[:,test_hertest.columns.isin(new_selection.columns)]
     scaled_data_test_hertest = scaler.transform(test_hertest_selection)
     pca_data_test_hertest = pca.transform(scaled_data_test_hertest)
-
-
     pce_test_hertest_df = pd.DataFrame(pca_data_test_hertest, index = test_hertest[['Subject number','Test Type']],
         columns = [f'PCA_{x}' for x in range(pca_data_test_hertest.shape[1])])
     pce_test_hertest_df['Subject number'], pce_test_hertest_df['Test Type'] = zip(*pce_test_hertest_df.index)
     pce_test_hertest_df.reset_index(drop = True, inplace = True)
     return pce_test_hertest_df
-
 
 # Validity and reliability
 
@@ -63,6 +54,11 @@ def rel_mean_absolute_error(predictions, targets):
     return round(rmae,3)
 
 def icc_mae(pca_test_hertest_df, number_of_components, verbose = None):
+    '''
+    Description:
+    Calculate ICC, MDS, etc. for the test-retest Principal components
+    '''
+
     results = pd.DataFrame(index = ['ICC', 'MDC', 'MAE', 'MAE_std', 'MAE_min',
     'MEA_max','MAPE', 'RMSE', 'RMSE_STD', 'RMSE_min', 'RMSE_max'],
                     columns = [f'PCA_{x}' for x in range(number_of_components)]).astype(float)

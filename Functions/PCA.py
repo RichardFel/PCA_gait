@@ -15,6 +15,10 @@ from sklearn.model_selection import cross_val_score
 
 
 def sphericity_kmo(new_selection, verbose = None):
+    '''
+    Description:
+    Calculate Kaiser-Meyer-Olkin
+    '''
     ## Bartlett sphericity
     #from factor_analyzer.factor_analyzer import calculate_bartlett_sphericity
     #chi_square_value,p_value=calculate_bartlett_sphericity(new_selection)
@@ -32,6 +36,11 @@ def sphericity_kmo(new_selection, verbose = None):
 
 # Pre processing
 def scaler(new_selection):
+    '''
+    Description:
+    Convert data to z-scores
+    '''
+
     scaler = preprocessing.StandardScaler() 
     scaler.fit(new_selection)
     scaledData = scaler.transform(new_selection) # Use s.transform on other data to scale other data
@@ -66,6 +75,10 @@ def var_explained(number_of_components, pca):
     show()
     
 def compute_pca(new_selection, scaledData, verbose = None, visualise = None):
+    '''
+    Description:
+    Create a Principal component analysis
+    '''
     n_components = min(len(new_selection.columns), len(new_selection))
     pca = PCA(n_components= n_components)
     pca.fit(scaledData)
@@ -87,6 +100,10 @@ def compute_pca(new_selection, scaledData, verbose = None, visualise = None):
 
 
 def compute_pca2(number_of_components, scaledData, new_selection):
+    '''
+    Description:
+    Create a Principal component analysis with less variables
+    '''
     # Again PCA but now with less variables
     pca = PCA(n_components= number_of_components)
     pca.fit(scaledData)
@@ -101,6 +118,10 @@ def compute_pca2(number_of_components, scaledData, new_selection):
 
 
 def cor_comp_var(pca, new_selection):
+    '''
+    Description:
+    Determine whcih features load strongly on which components
+    '''
     loadings_corr =  np.sqrt(pca.explained_variance_)*pca.components_.T 
     loadings_corr_df = pd.DataFrame(loadings_corr.transpose(), columns =new_selection.columns )
     
@@ -115,6 +136,11 @@ def cor_comp_var(pca, new_selection):
 # # Promax rotation of the components
 
 def rotate_pca(loadings_corr, new_selection):
+    '''
+    Description:
+    Rotate the components based on the loadings
+    '''
+
     rotator = Rotator(method='varimax', normalize = True)
     rotated_loadings = rotator.fit_transform(loadings_corr)
     labels = [f'PC{str(x)}' for x in range(1, loadings_corr.shape[1]+1)]
@@ -124,6 +150,10 @@ def rotate_pca(loadings_corr, new_selection):
 
 # Visualise 
 def bi_plot(rotated_loadings_df, coef1 = 'PC1', coef2 = 'PC2'):
+    '''
+    Description:
+    Create a biplot of the data
+    '''
     coeff = rotated_loadings_df.loc[:,coef1:coef2]
     def myplot(coeff,labels=None):
         n = coeff.shape[0]

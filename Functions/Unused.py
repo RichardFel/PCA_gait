@@ -1,3 +1,264 @@
+
+# Partial least squares
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.metrics import mean_squared_error
+from sklearn import model_selection
+from sklearn.model_selection import RepeatedKFold
+from sklearn import metrics
+
+mse = []
+n = len(totaal)
+
+totaal2 = totaal.drop(columns=['Subject number', 'T moment', 'aid', 'mean_gait_speed_DL_x',
+       'max_gait_speed_DL_x', 'steps_per_day_x', 'PCA_0', 'PCA_1', 'PCA_2',
+       'PCA_3', 'PCA_4'])
+
+
+# Columns: mean_gait_speed_DL, max_gait_speed_DL, mode_gait_speed_DL, steps_per_day, minutes_per_day
+columnToPredict = 'steps_per_day_y'
+x = totaal2.iloc[:,:70]
+_, x, _ = scaler(x)
+y = totaal2[[columnToPredict]].astype(float)
+
+r_2 = []
+for i in range(1,20):
+    pls = PLSRegression(n_components=i)
+    pls.fit(x,y)
+    r_2.append(pls.score(x,y))
+
+fig_f, ax_f = plt.subplots()
+x_axis = np.arange(1,20)
+ax_f.plot(x_axis, r_2 ,  linestyle = 'None', marker = 'o',)
+ax_f.set_title('R^2 per number of components')
+ax_f.set_xlabel('Number of components')
+ax_f.set_ylabel('R^2')
+
+pls = PLSRegression(n_components=10)
+pls.fit(x,y)
+
+predicted = pls.predict(x)
+actual = y
+
+if columnToPredict == 'max_gait_speed_DL_y':
+    min = 1
+    max = 4.5 
+elif columnToPredict == 'mean_gait_speed_DL_y':
+    min = 0
+    max = 2.5 
+else:
+    min = 0
+    max = 12000  
+
+fig_f, ax_f = plt.subplots()
+ax_f.plot(actual,predicted , linestyle = 'None', marker = 'o',)
+ax_f.set_title('True vs predicted: PLS 10 components')
+ax_f.set_xlabel('Actual')
+ax_f.set_ylabel('Predicted')
+ax_f.set_ylim(min,max)
+ax_f.set_xlim(min,max)
+
+r2 = pls.score(x,y)
+n = len(y)
+p = pls.n_components
+Adj_r2 = 1-(1-r2)*(n-1)/(n-p-1)
+
+print('\n')
+print('PLS combined model')
+print(f'R^2 : {r2}')
+print(f'ADJ R^2 : {Adj_r2}')
+print(f'RMSE: {root_mean_square_error(predicted, actual.values)}')
+print(f'MAE: {mean_absolute_error(predicted, actual)}')
+print('\n')
+
+
+x = x.loc[:,'KMPH R'].values
+x = np.reshape(x,(len(x),1))
+y = totaal2[[columnToPredict]].astype(float)
+pls = PLSRegression(n_components=1)
+pls.fit(x,y)
+print(f'PLS r^2 score {pls.score(x,y)}')
+predicted = pls.predict(x)
+actual = y
+fig_f, ax_f = plt.subplots()
+ax_f.plot(actual,predicted , linestyle = 'None', marker = 'o',)
+ax_f.set_title('True vs predicted: PLS gait speed only')
+ax_f.set_xlabel('Actual')
+ax_f.set_ylabel('Predicted')
+ax_f.set_ylim(min,max)
+ax_f.set_xlim(min,max)
+
+r2 = pls.score(x,y)
+n = len(y)
+p = len(model.coef_)
+Adj_r2 = 1-(1-r2)*(n-1)/(n-p-1)
+
+print('\n')
+print('PLS Gait speed only model')
+print(f'R^2 : {r2}')
+print(f'ADJ R^2 : {Adj_r2}')
+print(f'RMSE: {root_mean_square_error(predicted, actual.values)}')
+print(f'MAE: {mean_absolute_error(predicted, actual)}')
+print('\n')
+
+
+r2_list = []
+r2a_list = []
+rmse_list = []
+mae_list = []
+mse_list =[]
+actual_list = []
+predicted_list = []
+
+subj_list = pca_kmph['Subject number'].unique()
+columnToPredict = 'max_gait_speed_DL_y'
+if columnToPredict == 'steps_per_day_y':
+    totaal[[columnToPredict]] = totaal[[columnToPredict]].astype(int)
+
+per_k = 5
+
+for i in range(1,11):
+    actual_list = []
+    predicted_list = []
+    count = 0
+    for _ in range(1):
+        totaal = totaal.sample(frac=1)
+        for subj in subj_list:
+            count += 5
+            # Train/test split
+            test = totaal.loc[totaal['Subject number'].isin(subj)]
+            train = totaal.loc[~totaal['Subject number'].isin(test['Subject number'])]
+            train = train.drop_duplicates(subset = ['Subject number'])
+            train = train.drop(columns=['Subject number', 'T moment', 'aid', 'mean_gait_speed_DL_x',
+                'max_gait_speed_DL_x', 'steps_per_day_x', 'PCA_0', 'PCA_1', 'PCA_2',
+                'PCA_3', 'PCA_4'])
+            test = test.drop(columns=['Subject number', 'T moment', 'aid', 'mean_gait_speed_DL_x',
+                'max_gait_speed_DL_x', 'steps_per_day_x', 'PCA_0', 'PCA_1', 'PCA_2',
+                'PCA_3', 'PCA_4'])
+
+            # Prepare train data set
+            x = train.iloc[:,:70]
+            _, x, tmp_scaler = scaler(x)
+            y = train[[columnToPredict]]
+
+            # PLS on train dataset
+            pls = PLSRegression(n_components=i, tol = 1e-06)
+            pls.fit(x,y)
+            #pls.score(x,y)
+
+            # Prepare test data set
+            x_test = test.iloc[:,:70]
+            x_test = tmp_scaler.transform(x_test)
+            y_test = test[[columnToPredict]]
+
+            # Predict results 
+            if columnToPredict == 'steps_per_day_y':
+                predicted = pls.predict(x_test).astype(int)
+            else:
+                predicted = pls.predict(x_test)
+            actual = y_test
+            # r2 = pls.score(x_test,y_test)
+            # n = len(y)
+            # p = pls.n_components
+            # Adj_r2 = 1-(1-r2)*(n-1)/(n-p-1)
+            for val_1, val_2 in zip(actual.values, predicted):
+                actual_list.append(val_1[0])
+                predicted_list.append(val_2[0])
+
+    actual_list = np.array(actual_list)
+    predicted_list = np.array(predicted_list)
+    RMSE = root_mean_square_error(actual_list, predicted_list)
+    MAE = mean_absolute_error(actual_list, predicted_list)
+
+    print(f'Components {i} RMSE: {RMSE}')
+    print(f'Components {i} MAE: {MAE}')
+
+plt.plot(actual_list, predicted_list)
+# # mse = metrics.mean_squared_error(predicted,actual.values)    
+# # r2_list.append(r2)
+# # r2a_list.append(Adj_r2)
+# rmse_list.append(RMSE)
+# mae_list.append(MAE)
+# # mse_list.append(mse)
+
+# # print(r2_list)
+# # print(r2a_list)
+# print(rmse_list)
+# print(mae_list)
+# 
+# for i in range(1,10):
+#     score = -1*model_selection.cross_val_score(PLSRegression(n_components=i),
+#             x, y, scoring='neg_mean_squared_error').mean()    
+#     mse.append(score)
+# plt.plot(mse)
+# # totaal
+
+
+# Combined model
+
+
+
+
+
+# columns = np.append(['kmph'], high_icc.values )
+# model_2 = create_lmm(pca_daily_life, columnToPredict, randomEffect, columns)
+# fitted_model_2 = model_2.fit(reml=False)
+# print(fitted_model_2.summary())
+
+# log_model_1 = fitted_model_1.llf
+# log_model_2 = fitted_model_2.llf
+
+# LR_statistic = -2*(-log_model_2 - -log_model_1)
+# print(LR_statistic)
+
+# p_val = scipy.stats.chi2.sf(LR_statistic, 3)
+# print(p_val)
+
+
+
+# def root_mean_square_error(predictions, targets):
+#     rmse = np.sqrt(np.mean(((predictions - targets) ** 2)))
+#     return round(rmse,3)
+    
+# def mean_absolute_error(predictions, targets):
+#     mae = np.average(np.abs(predictions - targets))   
+#     return round(mae,3)
+
+# print(f'Dependent variable: {columnToPredict}')
+# print('Model 1:')
+# print(f'RMSE: {root_mean_square_error(fitted_model_1.fittedvalues.values,pca_daily_life[columnToPredict].values)}')
+# print(f'MAE: {mean_absolute_error(fitted_model_1.fittedvalues.values,pca_daily_life[columnToPredict].values)}')
+
+# print('Model 2:')
+# print(f'LL:{fitted_model_2.llf}')
+# print(f'AIc: {aic(fitted_model_2)}')
+# print(f'BIC: {bic(fitted_model_2)}')
+# print(f'RMSE: {root_mean_square_error(fitted_model_2.fittedvalues.values,pca_daily_life[columnToPredict].values)}')
+# print(f'MAE: {mean_absolute_error(fitted_model_2.fittedvalues.values,pca_daily_life[columnToPredict].values)}')
+
+# print('Comparison')
+
+# print(LR_statistic)
+# print(p_val)
+
+
+columns = ['steps_per_day', 'mean_gait_speed_DL', 'max_gait_speed_DL'] # 'mean_gait_speed_DL',
+subj_list = pca_kmph['Subject number'].unique()
+per_k = 5
+
+correlation = data.corr().abs()
+tmp_corr = correlation['KMPH R'][4:-1].loc[correlation['KMPH R'][4:-1] > 0.9]
+correlation = correlation.loc[~correlation.index.isin(tmp_corr.index.values)]
+
+# Define difinitive models
+base_model = ['KMPH R', 'aid']
+
+
+# Walking aid
+# columns = np.array(['kmph', 'aid'])
+# model_1 = create_lmm(data, columnToPredict, randomEffect, columns)
+# fitted_model_1 = model_1.fit(reml=False)
+# print(fitted_model_1.summary())
+
 '''
 Settings
 

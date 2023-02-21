@@ -2,6 +2,11 @@ import pandas as pd
 import numpy as np
 
 def describe_data(new_selection, selection):
+    '''
+    Description:
+    Print information about the files
+    '''
+
     pt_data = pd.read_excel('Excel files/Overzicht_pt/MS_Karateristieken_2022_10_18.xlsx',index_col = 0)
     pt_data = pt_data.loc[pt_data.index.isin(new_selection.index)]
     
@@ -52,3 +57,19 @@ def describe_data(new_selection, selection):
     
     BSS = pd.to_numeric(pt_data['BBS [0 - 56] ']).describe(include=[np.number])
     print(f'BSS mean: {round(BSS["mean"],1)} std {round(BSS["std"],1)} ')
+    
+    TCT = pd.to_numeric(pt_data['TCT']).describe(include=[np.number])
+    print(f'TCT mean: {round(TCT["mean"],1)} std {round(TCT["std"],1)} ')
+    
+    mRS = pd.to_numeric(pt_data['mRS']).describe(include=[np.number])
+    print(f'mRS mean: {round(mRS["mean"],1)} std {round(mRS["std"],1)} ')
+    
+    FACm = pd.to_numeric(pt_data['FAC methulpmiddel [0 - 5]']).describe(include=[np.number])
+    print(f'FACm mean: {round(FACm["mean"],1)} std {round(FACm["std"],1)} ')
+    
+    FACz = pd.to_numeric(pt_data['Fac zonder lhm']).describe(include=[np.number])
+    print(f'FACz mean: {round(FACz["mean"],1)} std {round(FACz["std"],1)} ')
+    
+    MI = pd.to_numeric(pt_data['Fac zonder lhm']).describe(include=[np.number])
+    print(f'FACz mean: {round(FACz["mean"],1)} std {round(FACz["std"],1)} ')
+    

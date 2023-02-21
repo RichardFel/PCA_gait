@@ -1,10 +1,13 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 
 def load_file(file = '0.95', verbose = None):
     '''
-    Loads the correct fle and adds the fac scores
+    Description:
+    1. Load the raw gait files
+    2. Load daily life gait characteristics & process to get a score per participant
     '''
     # Load the file
     selection = pd.read_excel(f'Excel files/Cleaned_files/clean_gait_{file}.xlsx', index_col = 0)
@@ -28,13 +31,17 @@ def load_file(file = '0.95', verbose = None):
     # Figure of data
     gait_daily_life['Gait speed [m/s]'] = gait_daily_life['KMPH'] / 3.6
     fig_f, ax_f = plt.subplots(1,2)
-    sns.histplot(data=gait_daily_life, x='Gait speed [m/s]', binwidth= 0.027, ax = ax_f[0])
-    ax_f[0].set_title('2A')
+    sns.histplot(data=gait_daily_life, x='Gait speed [m/s]', binwidth= 1/37, ax = ax_f[0])
+    ax_f[0].set_title('1A')
+    ax_f[0].grid(False)
     example = gait_daily_life.loc[gait_daily_life['Subject'] == 'S5398H']
     example.rename(columns = {'T_moment': 'T moment'}, inplace = True)
-    sns.histplot(data=example, x='Gait speed [m/s]', binwidth= 1/36, ax = ax_f[1],
+    sns.histplot(data=example, x='Gait speed [m/s]', binwidth= 1/37, ax = ax_f[1],
     hue = 'T moment', multiple="stack")
-    ax_f[1].set_title('2B')
+    ax_f[1].set_title('1B')
+    ax_f[1].grid(False)
+    ax_f[1].set_ylabel('Count')
+
     plt.tight_layout()
     fig_f.savefig('Images/distribution.pdf', dpi=300, format='pdf')
     # ax_f.set_title('Distribution gait speed in daily life')
@@ -77,6 +84,8 @@ def load_file(file = '0.95', verbose = None):
     multiple_2['sum'] += 3600 
     multiple_2.loc[:,'difference'] = multiple_2.loc[:,'sum'] - multiple_2.loc[:,'min']
     wearing_time = pd.concat((single, multiple_2), ignore_index = True)
+    wearing_time = wearing_time.loc[wearing_time['difference'] > 3800]
+    wearing_time.loc[wearing_time['difference'] < 8640, 'difference'] += 3800
     wearing_time['difference'] = wearing_time['difference'] / 8640
     
     # Calculate steps per day
